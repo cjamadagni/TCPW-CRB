@@ -251,10 +251,6 @@ TcpWestwood::GetSsThresh (Ptr<const TcpSocketState> tcb,
   double theta = 1.4; 
  
   //if the min_RTT is zero, we return the BW estimate instead of the RE estimate
-  if(m_minRtt.GetSeconds () !=0 && m_currentRE!=0)
-
-  std::cout<<double(tcb->m_cWnd/(uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ()))))<<std::endl;
-
   if(m_minRtt.GetSeconds () !=0 && m_currentRE!=0 && (tcb->m_cWnd/(uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ()))) < theta))
   {
    // re * rtt
