@@ -47,20 +47,22 @@ class EventId;
 /**
  * \ingroup congestionOps
  *
- * \brief An implementation of TCP Westwood and Westwood+.
+ * \brief An implementation of TCP Westwood, WestwoodCRB and Westwood+.
  *
- * Westwood and Westwood+ employ the AIAD (Additive Increase/Adaptive Decrease) 
+ * Westwood, WestwoodCRB and Westwood+ employ the AIAD (Additive Increase/Adaptive Decrease) 
  * congestion control paradigm. When a congestion episode happens, 
  * instead of halving the cwnd, these protocols try to estimate the network's
  * bandwidth and use the estimated value to adjust the cwnd. 
  * While Westwood performs the bandwidth sampling every ACK reception, 
- * Westwood+ samples the bandwidth every RTT.
+ * Westwood+ samples the bandwidth every RTT <FILL IN THE BLANKS>.
  *
- * The two main methods in the implementation are the CountAck (const TCPHeader&)
- * and the EstimateBW (int, const, Time). The CountAck method calculates
+ * The three main methods in the implementation are the CountAck (const TCPHeader&),
+ * the EstimateBW (int, const, Time) and the EstimateRE (int, const, Time). The CountAck method calculates
  * the number of acknowledged segments on the receipt of an ACK.
  * The EstimateBW estimates the bandwidth based on the value returned by CountAck
  * and the sampling interval (last ACK inter-arrival time for Westwood and last RTT for Westwood+).
+ * The EstimateRE <FILL IN THE BLANKS>
+
  */
 class TcpWestwood : public TcpNewReno
 {
@@ -123,7 +125,7 @@ private:
   void EstimateBW (const Time& rtt, Ptr<TcpSocketState> tcb);
   
   /**
-   * Estimate the network's RE
+   * \brief Estimate the network's RE
    *
    * \param [in] m_tvalue the T value used in the estimation of RE.
    * \param [in] tcb the socket state.
