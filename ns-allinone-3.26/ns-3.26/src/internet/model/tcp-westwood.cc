@@ -63,18 +63,6 @@ TcpWestwood::GetTypeId (void)
     .AddTraceSource("EstimatedRE", "The estimated rate",
                     MakeTraceSourceAccessor(&TcpWestwood::m_currentRE),
                     "ns3::TracedValueCallback::Double")
-  /*.AddAttribute ("tvalue",
-                   "t value",
-                   DoubleValue (5), 
-                   MakeDoubleAccessor (&TcpWestwood::m_tvalue),
-                   MakeDoubleChecker<double> (0)) */
- /* .AddAttribute ("tvalue",
-                   "Minimum retransmit timeout value",
-                   TimeValue (Seconds (5.0)), 
-                   MakeTimeAccessor (&TcpWestwood::SetMinRto,
-                                     &TcpWestwood::GetMinRto),
-                   MakeTimeChecker ()) 
-                   */
   ;
   return tid;
 }
@@ -117,16 +105,14 @@ TcpWestwood::~TcpWestwood (void)
 {
 }
 
-//who is calling this?
 
 void
 TcpWestwood::PktsAcked (Ptr<TcpSocketState> tcb, uint32_t packetsAcked,
                         const Time& rtt)
 {
    
-  //  std::cout<<"At the beginning of pktsacked, m_ackedsegments = "<<m_ackedSegments<<std::endl;
+  
   NS_LOG_FUNCTION (this << tcb << packetsAcked << rtt);
-  //std::cout<<packetsAcked<<std::endl;
 
   if (rtt.IsZero ())
     {
@@ -136,7 +122,6 @@ TcpWestwood::PktsAcked (Ptr<TcpSocketState> tcb, uint32_t packetsAcked,
 
   m_ackedSegments += packetsAcked;
   m_ackedSinceT += packetsAcked;
-  //std::cout<<"in the middle, m_ackedSegments = "<<m_ackedSegments<<std::endl;
   // Update minRtt
   if (m_minRtt.IsZero ())
     {
@@ -168,7 +153,6 @@ TcpWestwood::PktsAcked (Ptr<TcpSocketState> tcb, uint32_t packetsAcked,
     }
    else if (m_pType == TcpWestwood::WESTWOODCRB)
    {
-     //   std::cout<<"before RE, value = "<<m_ackedSegments<<std::endl;
          if (!m_IsCount)
         {
           m_IsCount = true;
@@ -176,76 +160,52 @@ TcpWestwood::PktsAcked (Ptr<TcpSocketState> tcb, uint32_t packetsAcked,
           m_reEstimateEvent = Simulator::Schedule (m_tvalue, &TcpWestwood::EstimateRE,
                                                    this, m_tvalue, tcb);
         } 
-      //  std::cout<<"after RE, value = "<<m_ackedSegments<<std::endl;
-      EstimateBW(rtt,tcb); //?
-     // m_ackedSegments = x;
-    // std::cout<<"Hello from CRB"<<std::endl;    
+      EstimateBW(rtt,tcb);    
    
    
    }
-    /* if ptype = crb
-      Estimatebw
-      m_reestimate.cancel
-      event = Simulator.sche (t, ) */
-   //    std::cout<<"At the end of pktsacked, m_ackedsegments = "<<m_ackedSegments<<std::endl;
-
 }
 
 
 void
 TcpWestwood::EstimateRE (const Time &tvalue, Ptr<TcpSocketState> tcb)
 {
- // std::cout<<"estimateRE"<<std::endl;
+ 
   NS_LOG_FUNCTION (this);
   
-  //changed rtt to t
-
   NS_ASSERT (!tvalue.IsZero ());
-
-  //std::cout<<m_ackedSinceT<<std::endl;
-  
-  //if (tvalue.GetSeconds ()!=0)  
-    m_currentRE = m_ackedSinceT * tcb->m_segmentSize / tvalue.GetSeconds ();
     
-    m_ackedSinceT = 0;
-  //else
-  //  m_currentRE = 0;
+  m_currentRE = m_ackedSinceT * tcb->m_segmentSize / tvalue.GetSeconds ();
+    
+  m_ackedSinceT = 0;
       
   if (m_pType == TcpWestwood::WESTWOODCRB)
     {
       m_IsCount = false;
     }
 
-  //m_ackedSegments = 0;
-  NS_LOG_LOGIC ("Estimated RE: " << m_currentRE);
-
   // Filter the BW sample
-
   double alpha = 0.9; //FIND OUT WHY
- //std::cout<<"before if, current RE is "<<m_currentRE<<std::endl;
+
   if (m_fType == TcpWestwood::NONE)
     {
-   // std::cout<<"hello there"<<std::endl;
+   
     }
   else if (m_fType == TcpWestwood::TUSTIN)
     {
-   //  std::cout<<"hello there tustin"<<std::endl;
       double sample_ree = m_currentRE;
       m_currentRE = (alpha * m_lastRE) + ((1 - alpha) * ((sample_ree + m_lastSampleRE) / 2));
       m_lastSampleRE = sample_ree;
       m_lastRE = m_currentRE;
     }
-     
-     //std::cout<<"after if, current RE is "<<m_currentRE<<std::endl;
    
-
   NS_LOG_LOGIC ("Estimated RE after filtering: " << m_currentRE);
 }
 
 void
 TcpWestwood::EstimateBW (const Time &rtt, Ptr<TcpSocketState> tcb)
 {
-    //std::cout<<"estimateBW"<<std::endl;
+
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT (!rtt.IsZero ());
@@ -261,7 +221,6 @@ TcpWestwood::EstimateBW (const Time &rtt, Ptr<TcpSocketState> tcb)
   NS_LOG_LOGIC ("Estimated BW: " << m_currentBW);
 
   // Filter the BW sample
-
   double alpha = 0.9;
 
   if (m_fType == TcpWestwood::NONE)
@@ -282,32 +241,23 @@ uint32_t
 TcpWestwood::GetSsThresh (Ptr<const TcpSocketState> tcb,
                           uint32_t bytesInFlight)
 {
-  //std::cout<<"getssthresh"<<std::endl;
+
   (void) bytesInFlight;
   NS_LOG_LOGIC ("CurrentBW: " << m_currentBW << " minRtt: " <<
                 m_minRtt << " ssthresh: " <<
                 m_currentBW * static_cast<double> (m_minRtt.GetSeconds ()));
- /*newss = if condintion on theta? bw:re;*/
+ 
  
   double theta = 1.4; 
-  
-  //std::cout<<m_currentRE<<"\t"<<m_minRtt.GetSeconds ()<<std::endl;
  
   //if the min_RTT is zero, we return the BW estimate instead of the RE estimate
   if(m_minRtt.GetSeconds () !=0 && m_currentRE!=0)
 
   std::cout<<double(tcb->m_cWnd/(uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ()))))<<std::endl;
 
-
- // std::cout<<m_currentRE<<"\t"<<m_currentBW<<std::endl;
- 
- 
- 
-
   if(m_minRtt.GetSeconds () !=0 && m_currentRE!=0 && (tcb->m_cWnd/(uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ()))) < theta))
   {
    // re * rtt
-   //std::cout<<"HELLO HELLO HELLO"<<std::endl;
      return std::max (2*tcb->m_segmentSize,
                    uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ())));
   }
