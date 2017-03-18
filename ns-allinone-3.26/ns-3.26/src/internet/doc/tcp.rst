@@ -409,14 +409,17 @@ More informations at: http://dl.acm.org/citation.cfm?id=2756518
 
 Westwood
 ^^^^^^^^
-Westwood and Westwood+ employ the AIAD (Additive Increase/Adaptive Decrease)·
-congestion control paradigm. When a congestion episode happens,·
+Westwood, WestwoodCRB and Westwood+ employ the AIAD (Additive Increase/Adaptive Decrease) 
+congestion control paradigm. When a congestion episode happens, 
 instead of halving the cwnd, these protocols try to estimate the network's
-bandwidth and use the estimated value to adjust the cwnd.·
-While Westwood performs the bandwidth sampling every ACK reception,·
-Westwood+ samples the bandwidth every RTT.
+bandwidth and use the estimated value to adjust the cwnd. 
+While Westwood performs the bandwidth sampling every ACK reception, 
+Westwood+ samples the bandwidth every RTT, and WestwoodCRB samples the bandwidth every RTT,
+and the long-term bandwidth (called rate) every time interval T. The protocol then chooses which of
+these two values to use in cwnd calculation, based on whether the loss was random or congestion-based.
 
-More informations at: http://dl.acm.org/citation.cfm?id=381704 and
+More informations at: http://dl.acm.org/citation.cfm?id=381704,
+http://dl.acm.org/citation.cfm?id=2286242, and
 http://dl.acm.org/citation.cfm?id=2512757
 
 Vegas
