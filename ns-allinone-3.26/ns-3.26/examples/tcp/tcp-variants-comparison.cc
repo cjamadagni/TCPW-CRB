@@ -217,7 +217,7 @@ int main (int argc, char *argv[])
   float duration = 200;
   uint32_t run = 0;
   bool flow_monitor = true;
-  bool pcap = true;
+  bool pcap = false;
   std::string queue_disc_type = "ns3::PfifoFastQueueDisc";
 
 

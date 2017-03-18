@@ -54,14 +54,17 @@ class EventId;
  * instead of halving the cwnd, these protocols try to estimate the network's
  * bandwidth and use the estimated value to adjust the cwnd. 
  * While Westwood performs the bandwidth sampling every ACK reception, 
- * Westwood+ samples the bandwidth every RTT <FILL IN THE BLANKS>.
+ * Westwood+ samples the bandwidth every RTT, and WestwoodCRB samples the bandwidth every RTT,
+ * and the long-term bandwidth (called rate) every time interval T. The protocol then chooses which of
+ * these two values to use in cwnd calculation, based on whether the loss was random or congestion-based.
  *
  * The three main methods in the implementation are the CountAck (const TCPHeader&),
  * the EstimateBW (int, const, Time) and the EstimateRE (int, const, Time). The CountAck method calculates
  * the number of acknowledged segments on the receipt of an ACK.
- * The EstimateBW estimates the bandwidth based on the value returned by CountAck
+ * The EstimateBW method estimates the bandwidth based on the value returned by CountAck
  * and the sampling interval (last ACK inter-arrival time for Westwood and last RTT for Westwood+).
- * The EstimateRE <FILL IN THE BLANKS>
+ * The EstimateRE method estimates the rate based on the value returned by CountAck
+ * and the sampling interval (either last T or last RTT for WestwoodCRB, based on loss type)
 
  */
 class TcpWestwood : public TcpNewReno
