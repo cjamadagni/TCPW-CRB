@@ -171,7 +171,7 @@ void
 TcpWestwood::EstimateRE (const Time &tvalue, Ptr<TcpSocketState> tcb)
 {
  
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << tvalue << tcb);
   
   NS_ASSERT (!tvalue.IsZero ());
     
