@@ -204,19 +204,19 @@ TraceNextRx (std::string &next_rx_seq_file_name)
 int main (int argc, char *argv[])
 {
   std::string transport_prot = "TcpWestwood";
-  double error_p = 0.05;
+  double error_p = 0.0;
   std::string bandwidth = "2Mbps";
   std::string delay = "0.01ms";
   std::string access_bandwidth = "10Mbps";
   std::string access_delay = "45ms";
-  bool tracing = true;
+  bool tracing = false;
   std::string prefix_file_name = "TcpVariantsComparison";
   double data_mbytes = 0;
   uint32_t mtu_bytes = 400;
   uint16_t num_flows = 1;
-  float duration = 200;
+  float duration = 100;
   uint32_t run = 0;
-  bool flow_monitor = true;
+  bool flow_monitor = false;
   bool pcap = false;
   std::string queue_disc_type = "ns3::PfifoFastQueueDisc";
 
