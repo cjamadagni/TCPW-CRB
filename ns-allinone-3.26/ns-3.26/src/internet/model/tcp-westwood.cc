@@ -185,7 +185,7 @@ TcpWestwood::EstimateRE (const Time &tvalue, Ptr<TcpSocketState> tcb)
     }
 
   // Filter the BW sample
-  double alpha = 0.9; //FIND OUT WHY
+  double alpha = 0.9; 
 
   if (m_fType == TcpWestwood::NONE)
     {
@@ -250,17 +250,15 @@ TcpWestwood::GetSsThresh (Ptr<const TcpSocketState> tcb,
  
   double theta = 1.4; 
  
-  //if the min_RTT is zero, we return the BW estimate instead of the RE estimate
+  // in TCPW-CRB, if the min_RTT is zero, we return the BW estimate instead of the RE estimate
   if(m_minRtt.GetSeconds () !=0 && m_currentRE!=0 && (tcb->m_cWnd/(uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ()))) < theta))
   {
-   // re * rtt
      return std::max (2*tcb->m_segmentSize,
                    uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ())));
   }
   
   else
-  {
-    //bw * rtt
+  { 
     return std::max (2*tcb->m_segmentSize,
                    uint32_t (m_currentBW * static_cast<double> (m_minRtt.GetSeconds ())));
   }
