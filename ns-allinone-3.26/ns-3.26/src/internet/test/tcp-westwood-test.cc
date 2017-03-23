@@ -60,7 +60,7 @@ private:
    */
   void ExecuteTest (void);
 
-  uint32_t m_cWnd;               //!< Congetion window
+  uint32_t m_cWnd;               //!< Congestion window
   uint32_t m_segmentSize;        //!< Segment size
   uint32_t m_packetsAcked;       //!< Number of packets acknowledged
   uint32_t m_ssThresh;           //!< Slow start threshold
@@ -134,9 +134,9 @@ TcpWestwoodTest::ExecuteTest ()
 
   cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
-  m_packetsAcked++;
 
-  NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 4809U,
+
+  NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 3994U,
                          "ssThresh has not updated correctly");
 }
 
