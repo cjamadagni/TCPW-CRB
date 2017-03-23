@@ -51,8 +51,8 @@ public:
    * \param name Name of the test
    */
 
-   TcpWestwoodTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
-                      uint32_t packetsAcked, Time rtt, const std::string &name);
+  TcpWestwoodTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
+                   uint32_t packetsAcked, Time rtt, const std::string &name);
 
 private:
   virtual void DoRun (void);
@@ -60,16 +60,16 @@ private:
    */
   void ExecuteTest (void);
 
-  uint32_t m_cWnd;               //!< cWnd
-  uint32_t m_segmentSize;        //!< segment size
-  uint32_t m_packetsAcked;       //!< segments acked
-  uint32_t m_ssThresh;           //!< ss thresh
-  Time m_rtt;                    //!< rtt
-  Ptr<TcpSocketState> m_state;   //!< state
+  uint32_t m_cWnd;               //!< Congetion window
+  uint32_t m_segmentSize;        //!< Segment size
+  uint32_t m_packetsAcked;       //!< Number of packets acknowledged
+  uint32_t m_ssThresh;           //!< Slow start threshold
+  Time m_rtt;                    //!< Round trip time
+  Ptr<TcpSocketState> m_state;   //!< State
 };
 
 TcpWestwoodTest::TcpWestwoodTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
-                                        uint32_t packetsAcked, Time rtt, const std::string &name)
+                                  uint32_t packetsAcked, Time rtt, const std::string &name)
   : TestCase (name),
     m_cWnd (cWnd),
     m_segmentSize (segmentSize),
@@ -96,48 +96,48 @@ TcpWestwoodTest::ExecuteTest ()
   m_state->m_segmentSize = m_segmentSize;
 
   Ptr<TcpWestwood> cong = CreateObject <TcpWestwood> ();
-  
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
-  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
-  m_packetsAcked++;
-  m_rtt = MilliSeconds(105);
-  
+
   cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
   m_packetsAcked++;
-  m_rtt = MilliSeconds(80);
-  
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
-  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
-  m_packetsAcked++;
-  m_rtt = MilliSeconds(100);
+  m_rtt = MilliSeconds (105);
 
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
   m_packetsAcked++;
-  m_rtt = MilliSeconds(110);
-  
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
-  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
-  m_packetsAcked++;  
-  m_rtt = MilliSeconds(140);
-  
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
+  m_rtt = MilliSeconds (80);
+
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
   m_packetsAcked++;
-  m_rtt = MilliSeconds(150);
-  
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
+  m_rtt = MilliSeconds (100);
+
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
   m_packetsAcked++;
-  m_rtt = MilliSeconds(190);
-  
-  cong->PktsAcked (m_state,m_packetsAcked,m_rtt); 
+  m_rtt = MilliSeconds (110);
+
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
+  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
+  m_packetsAcked++;
+  m_rtt = MilliSeconds (140);
+
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
+  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
+  m_packetsAcked++;
+  m_rtt = MilliSeconds (150);
+
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
+  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
+  m_packetsAcked++;
+  m_rtt = MilliSeconds (190);
+
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
   m_packetsAcked++;
 
-  NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 4809U, 
-                          "ssThresh has not updated correctly");
+  NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 4809U,
+                         "ssThresh has not updated correctly");
 }
 
 /**
