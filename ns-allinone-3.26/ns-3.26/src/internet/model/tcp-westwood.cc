@@ -86,6 +86,7 @@ TcpWestwood::TcpWestwood (void) :
 
 TcpWestwood::TcpWestwood (const TcpWestwood& sock) :
   TcpNewReno (sock),
+  m_pType (sock.m_pType),
   m_currentBW (sock.m_currentBW),
   m_currentRE (sock.m_currentRE),
   m_lastSampleBW (sock.m_lastSampleBW),
@@ -93,7 +94,6 @@ TcpWestwood::TcpWestwood (const TcpWestwood& sock) :
   m_lastSampleRE (sock.m_lastSampleRE),
   m_lastRE (sock.m_lastRE),
   m_minRtt (Time (0)),
-  m_pType (sock.m_pType),
   m_fType (sock.m_fType),
   m_IsCount (sock.m_IsCount)
 {
@@ -173,8 +173,8 @@ TcpWestwood::EstimateRE (const Time &tvalue, Ptr<TcpSocketState> tcb)
  
   NS_LOG_FUNCTION (this << tvalue << tcb);
   
-  NS_ASSERT (!tvalue.IsZero ());
-    
+  NS_ASSERT (!tvalue.IsZero ()); 
+
   m_currentRE = m_ackedSinceT * tcb->m_segmentSize / tvalue.GetSeconds ();
     
   m_ackedSinceT = 0;
@@ -215,7 +215,7 @@ TcpWestwood::EstimateBW (const Time &rtt, Ptr<TcpSocketState> tcb)
   if (m_pType == TcpWestwood::WESTWOODPLUS)
     {
       m_IsCount = false;
-    }
+    } 
 
   m_ackedSegments = 0;
   NS_LOG_LOGIC ("Estimated BW: " << m_currentBW);
@@ -248,7 +248,7 @@ TcpWestwood::GetSsThresh (Ptr<const TcpSocketState> tcb,
                 m_currentBW * static_cast<double> (m_minRtt.GetSeconds ()));
  
  
-  double theta = 1.4; 
+  double theta = 1.4;
  
   // in TCPW-CRB, if the min_RTT is zero, we return the BW estimate instead of the RE estimate
   if(m_minRtt.GetSeconds () !=0 && m_currentRE!=0 && (tcb->m_cWnd/(uint32_t (m_currentRE * static_cast<double> (m_minRtt.GetSeconds ()))) < theta))

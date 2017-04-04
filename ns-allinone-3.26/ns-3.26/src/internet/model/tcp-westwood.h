@@ -111,6 +111,8 @@ public:
 
   virtual Ptr<TcpCongestionOps> Fork ();
 
+  enum ProtocolType      m_pType;                  //!< 0 for Westwood, 1 for Westwood+
+
 private:
   /**
    * Update the total number of acknowledged packets during the current RTT
@@ -149,7 +151,7 @@ protected:
   double                 m_lastRE;                 //!< Last rate estimation (RE) sample after being filtered
   
   Time                   m_minRtt;                 //!< Minimum RTT
-  enum ProtocolType      m_pType;                  //!< 0 for Westwood, 1 for Westwood+
+  //
   enum FilterType        m_fType;                  //!< 0 for none, 1 for Tustin
 
   int                    m_ackedSegments;          //!< The number of segments ACKed between RTTs
@@ -157,6 +159,7 @@ protected:
   bool                   m_IsCount;                //!< Start keeping track of m_ackedSegments for Westwood+ if TRUE
   EventId                m_bwEstimateEvent;        //!< The BW estimation event for Westwood+
   EventId                m_reEstimateEvent;        //!< The RE estimation event for WestwoodCRB
+
 
 };
 

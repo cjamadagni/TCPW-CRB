@@ -144,6 +144,200 @@ TcpWestwoodTest::ExecuteTest ()
  * \ingroup internet-test
  * \ingroup tests
  *
+ * \brief Test case for TCP Westwood with Combined Rate and Bandwidth Estimation (CRB)
+ */
+
+class TcpWestwoodCRBTest : public TestCase
+{
+public:
+  /**
+   * \brief Constructor
+   *
+   * \param cWnd congestion window
+   * \param segmentSize segment size
+   * \param ssThresh slow start threshold
+   * \param packetsAcked packets acked
+   * \param rtt RTT
+   * \param name Name of the test
+   */
+
+  TcpWestwoodCRBTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
+                   uint32_t packetsAcked, Time rtt, const std::string &name);
+
+private:
+  virtual void DoRun (void);
+  /** \brief Execute the test
+   */
+  void ExecuteTest (void);
+  void RunWithDelay (Ptr<TcpWestwood>);
+
+  uint32_t m_cWnd;               //!< Congestion window
+  uint32_t m_segmentSize;        //!< Segment size
+  uint32_t m_packetsAcked;       //!< Number of packets acknowledged
+  uint32_t m_ssThresh;           //!< Slow start threshold
+  Time m_rtt;                    //!< Round trip time
+  Ptr<TcpSocketState> m_state;   //!< State
+};
+
+TcpWestwoodCRBTest::TcpWestwoodCRBTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
+                                  uint32_t packetsAcked, Time rtt, const std::string &name)
+  : TestCase (name),
+    m_cWnd (cWnd),
+    m_segmentSize (segmentSize),
+    m_packetsAcked (packetsAcked),
+    m_ssThresh (ssThresh),
+    m_rtt (rtt)
+{
+}
+
+void
+TcpWestwoodCRBTest::DoRun ()
+{
+  //Simulator::Schedule (Seconds (10), &TcpWestwoodCRBTest::ExecuteTest, this);
+  ExecuteTest();
+  Simulator::Stop(Seconds(10));
+  Simulator::Run ();
+  //Simulator::Stop(Seconds(10));
+  Simulator::Destroy ();
+}
+
+void
+TcpWestwoodCRBTest::ExecuteTest ()
+{
+  m_state = CreateObject <TcpSocketState> ();
+  m_state->m_cWnd = m_cWnd;
+  m_state->m_ssThresh = m_ssThresh;
+  m_state->m_segmentSize = m_segmentSize;
+
+  Ptr<TcpWestwood> cong = CreateObject <TcpWestwood> ();
+  cong->m_pType = TcpWestwood::WESTWOODCRB;
+
+  for(int i=1;i<=8;i++)
+    Simulator::Schedule (Seconds(0.2*i), &TcpWestwoodCRBTest::RunWithDelay, this, cong);     
+  Simulator::Run();
+  Simulator::Stop(Seconds(10));
+
+  
+  NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 3717U,
+                          "ssThresh has not updated correctly");
+}
+
+
+
+void
+TcpWestwoodCRBTest::RunWithDelay (Ptr<TcpWestwood> cong)
+{
+  int rtt_values[] = {105, 80, 110, 100, 140, 150, 190, 140};
+  static int k = 0;
+  m_rtt = MilliSeconds (rtt_values[k++]); 
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
+  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
+  //std::cout<<m_state->m_ssThresh<<std::endl;
+  m_packetsAcked++;
+  
+}
+
+/**
+ * \ingroup internet-test
+ * \ingroup tests
+ *
+ * \brief Test case for TCP Westwood with Combined Rate and Bandwidth Estimation (CRB)
+ */
+
+class TcpWestwoodPlusTest : public TestCase
+{
+public:
+  /**
+   * \brief Constructor
+   *
+   * \param cWnd congestion window
+   * \param segmentSize segment size
+   * \param ssThresh slow start threshold
+   * \param packetsAcked packets acked
+   * \param rtt RTT
+   * \param name Name of the test
+   */
+
+  TcpWestwoodPlusTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
+                   uint32_t packetsAcked, Time rtt, const std::string &name);
+
+private:
+  virtual void DoRun (void);
+  /** \brief Execute the test
+   */
+  void ExecuteTest (void);
+  void RunWithDelay (Ptr<TcpWestwood>);
+
+  uint32_t m_cWnd;               //!< Congestion window
+  uint32_t m_segmentSize;        //!< Segment size
+  uint32_t m_packetsAcked;       //!< Number of packets acknowledged
+  uint32_t m_ssThresh;           //!< Slow start threshold
+  Time m_rtt;                    //!< Round trip time
+  Ptr<TcpSocketState> m_state;   //!< State
+};
+
+TcpWestwoodPlusTest::TcpWestwoodPlusTest (uint32_t cWnd, uint32_t segmentSize, uint32_t ssThresh,
+                                  uint32_t packetsAcked, Time rtt, const std::string &name)
+  : TestCase (name),
+    m_cWnd (cWnd),
+    m_segmentSize (segmentSize),
+    m_packetsAcked (packetsAcked),
+    m_ssThresh (ssThresh),
+    m_rtt (rtt)
+{
+}
+
+void
+TcpWestwoodPlusTest::DoRun ()
+{
+  //Simulator::Schedule (Seconds (10), &TcpWestwoodCRBTest::ExecuteTest, this);
+  ExecuteTest();
+  Simulator::Stop(Seconds(10));
+  Simulator::Run ();
+  //Simulator::Stop(Seconds(10));
+  Simulator::Destroy ();
+}
+
+void
+TcpWestwoodPlusTest::ExecuteTest ()
+{
+  m_state = CreateObject <TcpSocketState> ();
+  m_state->m_cWnd = m_cWnd;
+  m_state->m_ssThresh = m_ssThresh;
+  m_state->m_segmentSize = m_segmentSize;
+
+  Ptr<TcpWestwood> cong = CreateObject <TcpWestwood> ();
+  cong->m_pType = TcpWestwood::WESTWOODPLUS;
+
+  for(int i=1;i<=8;i++)
+    Simulator::Schedule (Seconds(0.2*i), &TcpWestwoodPlusTest::RunWithDelay, this, cong);     
+  Simulator::Run();
+  Simulator::Stop(Seconds(10));
+
+  
+  //NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 3717U,
+  //                        "ssThresh has not updated correctly");
+}
+
+
+
+void
+TcpWestwoodPlusTest::RunWithDelay (Ptr<TcpWestwood> cong)
+{
+  int rtt_values[] = {105, 80, 110, 100, 140, 150, 190, 140};
+  static int k = 0;
+  m_rtt = MilliSeconds (rtt_values[k++]); 
+  cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
+  m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
+  std::cout<<m_state->m_ssThresh<<std::endl;
+  m_packetsAcked++;
+  
+}
+
+/**
+ * \ingroup internet-test
+ * \ingroup tests
+ *
  * \brief TCP Westwood TestSuite
  */
 class TcpWestwoodTestSuite : public TestSuite
@@ -151,7 +345,9 @@ class TcpWestwoodTestSuite : public TestSuite
 public:
   TcpWestwoodTestSuite () : TestSuite ("tcp-westwood-test", UNIT)
   {
-    AddTestCase (new TcpWestwoodTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood"), TestCase::QUICK);
+    //AddTestCase (new TcpWestwoodTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood"), TestCase::QUICK);
+    //AddTestCase (new TcpWestwoodCRBTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood-CRB"), TestCase::QUICK);
+    AddTestCase (new TcpWestwoodPlusTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood-Plus"), TestCase::QUICK);
   }
 };
 
