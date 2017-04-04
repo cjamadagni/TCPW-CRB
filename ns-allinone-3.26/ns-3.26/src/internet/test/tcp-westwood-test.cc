@@ -266,7 +266,7 @@ private:
   /** \brief Execute the test
    */
   void ExecuteTest (void);
-  void RunWithDelay (Ptr<TcpWestwood>);
+  void RunWithDelay (Ptr<TcpWestwood>, int);
 
   uint32_t m_cWnd;               //!< Congestion window
   uint32_t m_segmentSize;        //!< Segment size
@@ -309,27 +309,33 @@ TcpWestwoodPlusTest::ExecuteTest ()
   Ptr<TcpWestwood> cong = CreateObject <TcpWestwood> ();
   cong->m_pType = TcpWestwood::WESTWOODPLUS;
 
-  for(int i=1;i<=8;i++)
-    Simulator::Schedule (Seconds(0.2*i), &TcpWestwoodPlusTest::RunWithDelay, this, cong);     
+  int rtt_values[] = {105, 80, 110, 100, 140, 150, 190, 140, 180, 220};
+  static int k = 0;
+  static int sum = 0;
+
+  for(int i=1;i<=10;i++) {
+    sum+=rtt_values[i-1];
+    Simulator::Schedule (MilliSeconds(sum), &TcpWestwoodPlusTest::RunWithDelay, this, cong, rtt_values[k++]);     
+  }
+  
   Simulator::Run();
   Simulator::Stop(Seconds(10));
 
-  
-  //NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 3717U,
-  //                        "ssThresh has not updated correctly");
+  NS_TEST_ASSERT_MSG_EQ (m_state->m_ssThresh.Get (), 4267U,
+                          "ssThresh has not updated correctly");
 }
 
 
 
 void
-TcpWestwoodPlusTest::RunWithDelay (Ptr<TcpWestwood> cong)
+TcpWestwoodPlusTest::RunWithDelay (Ptr<TcpWestwood> cong, int rtt_value)
 {
-  int rtt_values[] = {105, 80, 110, 100, 140, 150, 190, 140};
-  static int k = 0;
-  m_rtt = MilliSeconds (rtt_values[k++]); 
+  
+  
+  m_rtt = MilliSeconds (rtt_value); 
   cong->PktsAcked (m_state,m_packetsAcked,m_rtt);
   m_state->m_ssThresh = cong->GetSsThresh (m_state, 32);
-  std::cout<<m_state->m_ssThresh<<std::endl;
+  //std::cout<<m_state->m_ssThresh<<"SSthresh\n";
   m_packetsAcked++;
   
 }
@@ -345,8 +351,8 @@ class TcpWestwoodTestSuite : public TestSuite
 public:
   TcpWestwoodTestSuite () : TestSuite ("tcp-westwood-test", UNIT)
   {
-    //AddTestCase (new TcpWestwoodTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood"), TestCase::QUICK);
-    //AddTestCase (new TcpWestwoodCRBTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood-CRB"), TestCase::QUICK);
+    AddTestCase (new TcpWestwoodTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood"), TestCase::QUICK);
+    AddTestCase (new TcpWestwoodCRBTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood-CRB"), TestCase::QUICK);
     AddTestCase (new TcpWestwoodPlusTest (2 * 1446, 1446, 4 * 1446, 4, MilliSeconds (100), "Testing ssThresh value of Westwood-Plus"), TestCase::QUICK);
   }
 };
